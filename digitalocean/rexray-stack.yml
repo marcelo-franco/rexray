@@ -1,0 +1,17 @@
+version: '3.7'
+#
+# plugin-rexray service uses Swarm Executor
+# Swarm Executor : Execute any docker command across swarm cluster
+# https://github.com/mavenugo/swarm-exec
+#
+services:
+  plugin-rexray:
+    image: mavenugo/swarm-exec:17.03.0-ce
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: docker plugin install --grant-all-permissions rexray/dobs DOBS_REGION=nyc3 REXRAY_PREEMPT=true DOBS_TOKEN=8cd1d33bcc9a8c734f6d7ff7f933825ec62a946196a6d88635c29503b8d7d91d DOBS_CONVERTUNDERSCORES=true
+    deploy:
+      mode: global
+      restart_policy:
+        condition: none
+

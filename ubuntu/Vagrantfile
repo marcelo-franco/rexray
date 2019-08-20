@@ -1,0 +1,39 @@
+#!/usr/bin/ruby    # A sintaxe do Vagrantfile é a do Ruby
+
+Vagrant.configure("2") do |config|
+
+  # Nodes to start
+  nodes = [ '01', '02', '03'] 
+
+  nodes.each do |i|
+    config.vm.define "vgr#{i}" do |node|
+      # https://www.vagrantup.com/docs/boxes.html#official-boxes
+      # https://app.vagrantup.com/bento/boxes/ubuntu-16.04
+      node.vm.box = "bento/ubuntu-16.04"
+      #config.vm.box_version = "201906.18.0" 
+      #node.vm.synced_folder "E:\\\\", "/e"
+      node.vm.network "public_network"
+      node.vm.hostname = "vgr#{i}"
+
+      # Faz algumas alterações na configuração da máquina virtual:
+      # 1. Altera o nome padrão do controlador SATA para "SATA" 
+      # 2. Define 30 portas de conexão para o controlador SATA, necessário para
+      # que o REX-Ray possa adicionar volumes
+      # 3. Gera um "mac address" automaticamente
+      # 4. Define um nome para a máquina virtual
+      node.vm.provider :virtualbox do |vb|
+        # Use "vagrant --donotrename up" para não tentar renomear o controlador SATA, senão 
+        # voce terá um erro quando rodar "vagrant up" pela segunda vez
+        if !ARGV.include?("--donotrename") then
+          vb.customize ["storagectl", :id, "--name", "SATA Controller", "--rename", "SATA"] 
+          vb.customize ["storagectl", :id, "--name", "SATA", "--portcount", "30"]
+        end if
+        vb.customize ["modifyvm", :id, "--macaddress1", "auto"]
+        vb.name = "vgr#{i}"
+      end
+   end
+  end
+  config.vm.provision "docker" do |d|
+    # instala o Docker, se ainda não foi instalado
+  end
+end

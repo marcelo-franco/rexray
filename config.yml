@@ -1,0 +1,11 @@
+libstorage:
+  service: virtualbox
+  integration:
+    volume:
+      operations:
+        mount:
+          preempt: true
+virtualbox:
+  endpoint: http://192.168.99.1:18083
+  volumePath: /e/training/rexray/vols
+  controllerName: SATA
